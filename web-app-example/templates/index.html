@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplicație de predicție</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        h1, label, #prediction_result {
+         color: white;
+        }
+
+        #main {
+            width: 512px;
+            height: 512px;
+            background: url("./static/bg.jpg");
+            background-size: 512px 512px;
+            background-blend-mode: multiply;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        input, select {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        input[type=number] {
+            padding: 0px, 10px;
+        }
+    </style>
+</head>
+<body class="container mx-auto px-[30px]">
+    <div class="flex flex-col items-center min-h-[100vh] justify-center">
+        <div id="main" class="flex flex-col justify-center gap-[15px] my-[50px] p-[30px_50px] shadow-[0_15px_42px_rgba(0,0,0,.75)] rounded-[10px]">
+            <h1 class="text-3xl font-bold">Google Play Application - Predict rating</h1>
+            <div class="flex justify-between items-center">
+                <label class="text-[20px] font-medium" for="rating_count">Rating Count:</label>
+                <input class="p-[5px_10px] rounded-[5px]" type="number" id="rating_count" name="rating_count" value="1600">
+            </div>
+            <div class="flex justify-between items-center">
+                <label class="text-[20px] font-medium" for="min_installs">Minimum Installs:</label>
+                <input class="p-[5px_10px] rounded-[5px]" type="number" id="min_installs" name="min_installs" value="10000">
+            </div>
+            <div class="flex justify-between items-center">
+                <label class="text-[20px] font-medium" for="max_installs">Maximum Installs:</label>
+                <input class="p-[5px_10px] rounded-[5px]" type="number" id="max_installs" name="max_installs" value="50000">
+            </div>
+            <div class="flex justify-between items-center">
+                <label class="text-[20px] font-medium" for="price">Price:</label>
+                <input class="p-[5px_10px] rounded-[5px]" type="number" id="price" name="price" value="0">
+            </div>
+            <div class="flex justify-between items-center">
+                <label class="text-[20px] font-medium" for="ad_supported">Ad Supported:</label>
+                <select class="p-[5px_10px] rounded-[5px]" id="ad_supported" name="ad_supported">
+                    <option value="1">True</option>
+                    <option value="0">False</option>
+                </select>
+            </div>
+            <button class="text-white text-[20px] font-medium p-[10px_15px] rounded-[10px] bg-black" id="predict_button">
+                Predict
+            </button>
+            <div class="text-[20px] self-center" id="prediction_result"></div>
+        </div>
+    </div>
+
+    <script>
+        function predictRating() {
+            var ratingCount = $('#rating_count').val();
+            var minInstalls = $('#min_installs').val();
+            var maxInstalls = $('#max_installs').val();
+            var price = $('#price').val();
+            var adSupported = $('#ad_supported').val();
+
+            fetch('/predict_rating', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'Rating Count': ratingCount,
+                    'Minimum Installs': minInstalls,
+                    'Maximum Installs': maxInstalls,
+                    'Price': price,
+                    'Ad Supported_True': adSupported
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                $('#prediction_result').text('Predicted Rating: ' + data.predicted_rating);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        $('#predict_button').on('click', predictRating);
+    </script>
+</body>
+</html>
